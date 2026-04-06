@@ -1,0 +1,10 @@
+services:
+  voxify:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - voxify-data:/app/data
+
+volumes:
+  voxify-data:

@@ -1,0 +1,5 @@
+py-cord[voice]==v2.8.0rc1
+mistralai
+aiosqlite
+python-dotenv
+cryptography
