@@ -1,6 +1,8 @@
 from mistralai.client import Mistral
 
-client = Mistral(api_key="OCGMshaQdxnvTblJRi0dK5c5AQNVILHy")
+key = input("Enter Mistral API key: ")
+
+client = Mistral(api_key=key)
 
 result = client.audio.voices.list(limit=10, offset=0)
 
