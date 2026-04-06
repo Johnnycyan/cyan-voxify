@@ -26,3 +26,10 @@ class GuildSpeaker:
     guild_id: str
     user_id: str
     voice_id: str
+
+
+@dataclass
+class VoiceAfFilter:
+    guild_id: str
+    voice_id: str
+    af_filter: str

@@ -56,9 +56,7 @@ class Settings(commands.Cog):
 
     @config_global.command(name="apikey", description="Set the Mistral API key")
     @option("key", str, description="Your Mistral API key")
-    async def global_apikey(
-        self, ctx: discord.ApplicationContext, key: str
-    ) -> None:
+    async def global_apikey(self, ctx: discord.ApplicationContext, key: str) -> None:
         if not await self._require_admin(ctx):
             return
         await queries.set_api_key(key)
@@ -148,9 +146,7 @@ class Settings(commands.Cog):
     # GUILD COMMANDS
     # =====================================================================
 
-    @config_guild.command(
-        name="add-speaker", description="Add a user–voice mapping"
-    )
+    @config_guild.command(name="add-speaker", description="Add a user–voice mapping")
     @option("user", discord.User, description="Discord user")
     @option("voice_id", str, description="Voxtral voice ID for this user")
     async def guild_add_speaker(
@@ -178,15 +174,11 @@ class Settings(commands.Cog):
             return
         removed = await queries.remove_speaker(str(ctx.guild_id), str(user.id))
         if removed:
-            await ctx.respond(
-                f"Speaker {user.mention} removed.", ephemeral=True
-            )
+            await ctx.respond(f"Speaker {user.mention} removed.", ephemeral=True)
         else:
             await ctx.respond("That user is not a configured speaker.", ephemeral=True)
 
-    @config_guild.command(
-        name="list-speakers", description="List configured speakers"
-    )
+    @config_guild.command(name="list-speakers", description="List configured speakers")
     async def guild_list_speakers(self, ctx: discord.ApplicationContext) -> None:
         if not await self._require_guild_manager(ctx):
             return
@@ -195,9 +187,7 @@ class Settings(commands.Cog):
             await ctx.respond("No speakers configured.", ephemeral=True)
             return
 
-        lines = [
-            f"• <@{s.user_id}> → `{s.voice_id}`" for s in speakers
-        ]
+        lines = [f"• <@{s.user_id}> → `{s.voice_id}`" for s in speakers]
         await ctx.respond("\n".join(lines), ephemeral=True)
 
     @config_guild.command(
@@ -214,7 +204,9 @@ class Settings(commands.Cog):
         if cid not in current:
             current.append(cid)
             await queries.set_channel_whitelist(str(ctx.guild_id), current)
-        await ctx.respond(f"Channel {channel.mention} added to whitelist.", ephemeral=True)
+        await ctx.respond(
+            f"Channel {channel.mention} added to whitelist.", ephemeral=True
+        )
 
     @config_guild.command(
         name="whitelist-remove", description="Remove a channel from the whitelist"
@@ -243,7 +235,9 @@ class Settings(commands.Cog):
         if not await self._require_guild_manager(ctx):
             return
         await queries.set_channel_whitelist(str(ctx.guild_id), [])
-        await ctx.respond("Channel whitelist cleared — all channels allowed.", ephemeral=True)
+        await ctx.respond(
+            "Channel whitelist cleared — all channels allowed.", ephemeral=True
+        )
 
     @config_guild.command(
         name="whitelist-show", description="Show the current channel whitelist"
@@ -253,7 +247,9 @@ class Settings(commands.Cog):
             return
         current = await queries.get_channel_whitelist(str(ctx.guild_id))
         if not current:
-            await ctx.respond("No whitelist set — all channels allowed.", ephemeral=True)
+            await ctx.respond(
+                "No whitelist set — all channels allowed.", ephemeral=True
+            )
         else:
             mentions = [f"<#{cid}>" for cid in current]
             await ctx.respond(
@@ -278,6 +274,63 @@ class Settings(commands.Cog):
             )
         else:
             await ctx.respond("Guild idle timeout cleared.", ephemeral=True)
+
+    @config_guild.command(
+        name="af-set",
+        description="Set a custom FFmpeg -af filter for a voice ID",
+    )
+    @option("voice_id", str, description="Voxtral voice ID to apply the filter to")
+    @option(
+        "filter",
+        str,
+        description="FFmpeg audio filter string (e.g. volume=-6dB,highpass=f=120)",
+    )
+    async def guild_af_set(
+        self,
+        ctx: discord.ApplicationContext,
+        voice_id: str,
+        filter: str,
+    ) -> None:
+        if not await self._require_guild_manager(ctx):
+            return
+        await queries.set_voice_af_filter(str(ctx.guild_id), voice_id, filter)
+        await ctx.respond(f"AF filter set for voice `{voice_id}`.", ephemeral=True)
+
+    @config_guild.command(
+        name="af-remove",
+        description="Remove the FFmpeg -af filter for a voice ID",
+    )
+    @option("voice_id", str, description="Voxtral voice ID to remove the filter from")
+    async def guild_af_remove(
+        self,
+        ctx: discord.ApplicationContext,
+        voice_id: str,
+    ) -> None:
+        if not await self._require_guild_manager(ctx):
+            return
+        removed = await queries.remove_voice_af_filter(str(ctx.guild_id), voice_id)
+        if removed:
+            await ctx.respond(
+                f"AF filter removed for voice `{voice_id}`.", ephemeral=True
+            )
+        else:
+            await ctx.respond(
+                f"No AF filter found for voice `{voice_id}`.", ephemeral=True
+            )
+
+    @config_guild.command(
+        name="af-list",
+        description="List all configured AF filters for this guild",
+    )
+    async def guild_af_list(self, ctx: discord.ApplicationContext) -> None:
+        if not await self._require_guild_manager(ctx):
+            return
+        filters = await queries.get_all_voice_af_filters(str(ctx.guild_id))
+        if not filters:
+            await ctx.respond("No AF filters configured.", ephemeral=True)
+            return
+        lines = [f"• `{f.voice_id}` → `{f.af_filter}`" for f in filters]
+        await ctx.respond("\n".join(lines), ephemeral=True)
 
 
 def setup(bot: discord.Bot) -> None:

@@ -140,17 +140,25 @@ class TTSSession:
                     except discord.HTTPException:
                         pass
 
-                await self._play_audio(audio)
+                af_filter = await queries.get_voice_af_filter(
+                    str(self.guild.id), speaker.voice_id
+                )
+                await self._play_audio(audio, af_filter)
         except asyncio.CancelledError:
             pass
         except Exception:
             log.exception("Queue processor crashed")
 
-    async def _play_audio(self, audio_bytes: bytes) -> None:
+    async def _play_audio(
+        self, audio_bytes: bytes, af_filter: Optional[str] = None
+    ) -> None:
         if not self.voice_client.is_connected():
             return
 
-        source = discord.FFmpegPCMAudio(io.BytesIO(audio_bytes), pipe=True)
+        options = f"-af {af_filter}" if af_filter else None
+        source = discord.FFmpegPCMAudio(
+            io.BytesIO(audio_bytes), pipe=True, options=options
+        )
 
         done = asyncio.Event()
 

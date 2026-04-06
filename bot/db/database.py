@@ -32,6 +32,13 @@ CREATE TABLE IF NOT EXISTS guild_speakers (
     voice_id TEXT NOT NULL,
     PRIMARY KEY (guild_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS voice_af_filters (
+    guild_id  TEXT NOT NULL,
+    voice_id  TEXT NOT NULL,
+    af_filter TEXT NOT NULL,
+    PRIMARY KEY (guild_id, voice_id)
+);
 """
 
 
