@@ -22,11 +22,19 @@ class SpeakerInfo:
     channel_id: str  # text channel the speaker activated from
 
 
+_COST_PER_1K_CHARS = 0.016
+
+
 @dataclass
 class SessionStats:
     start_time: float = field(default_factory=time.monotonic)
     messages_processed: int = 0
     audio_bytes_generated: int = 0
+    characters_processed: int = 0
+
+    @property
+    def estimated_cost(self) -> float:
+        return (self.characters_processed / 1000) * _COST_PER_1K_CHARS
 
     @property
     def duration_seconds(self) -> float:
@@ -124,6 +132,7 @@ class TTSSession:
 
                 self.stats.messages_processed += 1
                 self.stats.audio_bytes_generated += len(audio)
+                self.stats.characters_processed += len(text)
 
                 if len(message.content) > 4000:
                     try:
@@ -238,6 +247,16 @@ class TTSSession:
             embed.add_field(
                 name="Audio Generated",
                 value=f"{self.stats.audio_minutes:.2f} min",
+                inline=True,
+            )
+            embed.add_field(
+                name="Characters Processed",
+                value=f"{self.stats.characters_processed:,}",
+                inline=True,
+            )
+            embed.add_field(
+                name="Estimated Cost",
+                value=f"${self.stats.estimated_cost:.4f}",
                 inline=True,
             )
             speakers = ", ".join(f"<@{s.user_id}>" for s in self.speakers.values())
