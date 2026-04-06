@@ -227,6 +227,10 @@ class TTS(commands.Cog):
         if cleaned is None:
             return
 
+        # Ignore command-like messages
+        if cleaned.startswith("!"):
+            return
+
         # Truncation warning
         if len(cleaned) > MAX_TTS_LENGTH:
             try:
