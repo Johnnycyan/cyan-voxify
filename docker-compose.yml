@@ -1,6 +1,6 @@
 services:
   voxify:
-    build: .
+    image: ghcr.io/johnnycyan/cyan-voxify:main
     restart: unless-stopped
     env_file: .env
     volumes:
