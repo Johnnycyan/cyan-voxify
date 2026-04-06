@@ -23,7 +23,9 @@ class TTS(commands.Cog):
 
     # ── /tts ───────────────────────────────────────────────────────────────
 
-    @commands.slash_command(name="tts", description="Start TTS in your current voice channel")
+    @commands.slash_command(
+        name="tts", description="Start TTS in your current voice channel"
+    )
     @option(
         "user",
         discord.User,
@@ -36,7 +38,9 @@ class TTS(commands.Cog):
         user: Optional[discord.User] = None,
     ) -> None:
         if ctx.guild is None:
-            await ctx.respond("This command can only be used in a server.", ephemeral=True)
+            await ctx.respond(
+                "This command can only be used in a server.", ephemeral=True
+            )
             return
 
         await ctx.defer(ephemeral=True)
@@ -92,9 +96,7 @@ class TTS(commands.Cog):
         # --- caller must be in a voice channel --------------------------------
         member = ctx.guild.get_member(caller_id)
         if member is None or member.voice is None or member.voice.channel is None:
-            await ctx.followup.send(
-                "You need to join a voice channel first."
-            )
+            await ctx.followup.send("You need to join a voice channel first.")
             return
 
         target_vc = member.voice.channel
@@ -150,7 +152,9 @@ class TTS(commands.Cog):
     @commands.slash_command(name="stop", description="Stop TTS in this server")
     async def stop_cmd(self, ctx: discord.ApplicationContext) -> None:
         if ctx.guild is None:
-            await ctx.respond("This command can only be used in a server.", ephemeral=True)
+            await ctx.respond(
+                "This command can only be used in a server.", ephemeral=True
+            )
             return
 
         guild_id = ctx.guild.id
@@ -264,7 +268,9 @@ class TTS(commands.Cog):
         # Count non-bot members remaining
         humans = [m for m in before.channel.members if not m.bot]
         if len(humans) == 0:
-            log.info("All users left VC in guild %s – stopping session", member.guild.id)
+            log.info(
+                "All users left VC in guild %s – stopping session", member.guild.id
+            )
             await session.stop()
             self._sm.remove(member.guild.id)
 

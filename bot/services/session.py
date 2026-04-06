@@ -117,9 +117,7 @@ class TTSSession:
                 if speaker is None:
                     continue
 
-                audio = await self.tts_service.generate_speech(
-                    text, speaker.voice_id
-                )
+                audio = await self.tts_service.generate_speech(text, speaker.voice_id)
                 if audio is None:
                     log.warning("TTS generation failed for message %s", message.id)
                     continue
@@ -143,9 +141,7 @@ class TTSSession:
         if not self.voice_client.is_connected():
             return
 
-        source = discord.FFmpegPCMAudio(
-            io.BytesIO(audio_bytes), pipe=True
-        )
+        source = discord.FFmpegPCMAudio(io.BytesIO(audio_bytes), pipe=True)
 
         done = asyncio.Event()
 
@@ -228,9 +224,7 @@ class TTSSession:
                 title="Voxify Session Report",
                 color=discord.Color.blurple(),
             )
-            embed.add_field(
-                name="Guild", value=self.guild.name, inline=True
-            )
+            embed.add_field(name="Guild", value=self.guild.name, inline=True)
             embed.add_field(
                 name="Duration",
                 value=f"{hours}h {mins}m {secs}s",
@@ -246,12 +240,8 @@ class TTSSession:
                 value=f"{self.stats.audio_minutes:.2f} min",
                 inline=True,
             )
-            speakers = ", ".join(
-                f"<@{s.user_id}>" for s in self.speakers.values()
-            )
-            embed.add_field(
-                name="Speakers", value=speakers or "None", inline=False
-            )
+            speakers = ", ".join(f"<@{s.user_id}>" for s in self.speakers.values())
+            embed.add_field(name="Speakers", value=speakers or "None", inline=False)
             await channel.send(embed=embed)
         except Exception:
             log.exception("Failed to send session report")
