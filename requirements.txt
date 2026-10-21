@@ -3,3 +3,4 @@ mistralai
 aiosqlite
 python-dotenv
 cryptography
+certifi>=2026.10.19
